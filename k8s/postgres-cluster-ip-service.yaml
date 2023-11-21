@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-cluster-ip-service
+spec:
+  type: ClusterIP          #Type of Service
+  ports:
+    - port: 5432          #Port for the Service itself
+      targetPort: 5432    #Port for the Targeted Pod
+  selector:               #Compliments the Label in Pod
+    component: postgres

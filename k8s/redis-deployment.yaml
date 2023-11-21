@@ -1,0 +1,19 @@
+apiVersion: apps/v1                         #Set of Object Types
+kind: Deployment                            #Kind (Type) of Object
+metadata:
+  name: redis-deployment                   #Name of the Deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: redis
+  template:
+    metadata:
+      labels:
+        component: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis
+          ports:
+            - containerPort: 6379
