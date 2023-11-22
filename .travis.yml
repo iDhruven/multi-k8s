@@ -3,35 +3,9 @@ services:
   - docker
 
 before_install:
+  - openssl -d
+  - curl https://sdk.cloud.google.com | bash > /dev/null;                         # Download Google Cloud SDK
+  - source $HOME/google-cloud-sdk/path.bash.inc
+  - gcloud components update kubectl                                              # Install and update Kubectl on Travis
+  - gcloud auth activate-service-account --key-file service-account.json
   - docker build -t idhruven/react-test -f ./client/Dockerfile.dev ./client
-
-script:
-  - docker run idhruven/react-test npm test -- --coverage
-
-after_success:
- - docker build -t idhruven/multi-client ./client
- - docker build -t idhruven/multi-nginx ./nginx
- - docker build -t idhruven/multi-server ./server
- - docker build -t idhruven/multi-worker ./worker
-
- #Log in to the Docker CLI
- - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
-
- #Take the images and push to Docker Hub
- - docker push idhruven/multi-client
- - docker push idhruven/multi-nginx
- - docker push idhruven/multi-server
- - docker push idhruven/multi-worker
-
-deploy:
-  provider: elasticbeanstalk
-  region: "us-west-2"
-  app: "multi-docker"
-  env: "MultiDocker-env"
-  bucket_name: "elasticbeanstalk-us-west-2-19287467319873"
-  bucket_path: "docker-react" #AppName
-  on:
-    branch: main
-  access_key_id: $AWS_ACCESS_KEY
-  secret_access_key:
-    secure: "$AWS_SECRET_KEY"
